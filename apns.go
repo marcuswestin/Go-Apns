@@ -33,18 +33,15 @@ type Apn struct {
 }
 
 // New Apn with cert_filename and key_filename.
-func New(cert_filename, key_filename, server string, timeout time.Duration) (*Apn, error) {
+func New(certPEMBlock, keyPEMBlock []byte, server string, timeout time.Duration) (*Apn, error) {
 	echan := make(chan error)
 
-	cert, err := tls.LoadX509KeyPair(cert_filename, key_filename)
+	certificate, err := tls.X509KeyPair(certPEMBlock, keyPEMBlock)
 	if err != nil {
 		return nil, err
 	}
 
-	certificate := []tls.Certificate{cert}
-	conf := &tls.Config{
-		Certificates: certificate,
-	}
+	conf := &tls.Config{Certificates: []tls.Certificate{certificate}}
 
 	ret := &Apn{
 		ErrorChan: echan,
