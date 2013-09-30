@@ -13,7 +13,6 @@ import (
 
 type Notification struct {
 	DeviceToken        string
-	Identifier         uint32
 	ExpireAfterSeconds int
 
 	Payload *Payload
@@ -23,10 +22,11 @@ type Notification struct {
 type Apn struct {
 	ErrorChan <-chan error
 
-	server  string
-	conf    *tls.Config
-	conn    *tls.Conn
-	timeout time.Duration
+	server     string
+	conf       *tls.Config
+	conn       *tls.Conn
+	timeout    time.Duration
+	identifier uint32
 
 	sendChan  chan *sendArg
 	errorChan chan error
@@ -124,7 +124,7 @@ func (a *Apn) send(notification *Notification) error {
 
 	buffer := bytes.NewBuffer([]byte{})
 	binary.Write(buffer, binary.BigEndian, uint8(1))
-	binary.Write(buffer, binary.BigEndian, uint32(notification.Identifier))
+	binary.Write(buffer, binary.BigEndian, a.identifier)
 	binary.Write(buffer, binary.BigEndian, uint32(expiry))
 	binary.Write(buffer, binary.BigEndian, uint16(len(tokenbin)))
 	binary.Write(buffer, binary.BigEndian, tokenbin)
@@ -132,6 +132,7 @@ func (a *Apn) send(notification *Notification) error {
 	binary.Write(buffer, binary.BigEndian, payloadbyte)
 	pushPackage := buffer.Bytes()
 
+	a.identifier += 1
 	_, err = a.conn.Write(pushPackage)
 	if err != nil {
 		return fmt.Errorf("write socket error: %s", err)
