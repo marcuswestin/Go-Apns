@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 )
 
-type Alert struct {
+type AlertDictionary struct {
 	Body          string   `json:"body,omitempty"`
 	LockKey       string   `json:"loc-key,omitempty"`
 	LockArgs      []string `json:"loc-args,omitempty"`
@@ -15,9 +15,10 @@ type Alert struct {
 // If AlertStruct set to any instance, it will ignore any content in Alert when send to iOS.
 // To use simple string Alert, make sure AlertStruct's value is nil.
 type Aps struct {
-	Alert Alert  `json:"alert,omitempty"`
-	Badge int    `json:"badge,omitempty"`
-	Sound string `json:"sound,omitempty"`
+	AlertString     string          `json:"alert,omitempty"`
+	AlertDictionary AlertDictionary `json:"alert,omitempty"`
+	Badge           int             `json:"badge,omitempty"`
+	Sound           string          `json:"sound,omitempty"`
 }
 
 type Payload struct {
