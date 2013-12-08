@@ -5,7 +5,6 @@ import (
 	"crypto/tls"
 	"encoding/binary"
 	"encoding/hex"
-	"encoding/json"
 	"fmt"
 	"net"
 	"time"
@@ -110,13 +109,22 @@ func (a *Apn) connect() (<-chan int, error) {
 	return quit, nil
 }
 
+const maxPayloadBytes = 256
+
 func (a *Apn) send(notification *Notification) error {
 	tokenbin, err := hex.DecodeString(notification.DeviceToken)
 	if err != nil {
 		return fmt.Errorf("convert token to hex error: %s", err)
 	}
 
-	payloadbyte, _ := json.Marshal(notification.Payload)
+	payloadbyte, err := notification.Payload.MarshalJSON()
+	if err != nil {
+		return fmt.Errorf("convert payload to json: %s", err)
+	}
+	if len(payloadbyte) > maxPayloadBytes {
+		return fmt.Errorf("payload json too large: %s", string(payloadbyte))
+	}
+
 	expiry := time.Now().Add(time.Duration(notification.ExpireAfterSeconds) * time.Second).Unix()
 
 	buffer := bytes.NewBuffer([]byte{})
