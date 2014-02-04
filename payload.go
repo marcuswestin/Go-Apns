@@ -15,10 +15,10 @@ type AlertDictionary struct {
 // If AlertStruct set to any instance, it will ignore any content in Alert when send to iOS.
 // To use simple string Alert, make sure AlertStruct's value is nil.
 type Aps struct {
-	AlertString     string          `json:"alert,omitempty"`
-	AlertDictionary AlertDictionary `json:"alert,omitempty"`
-	Badge           int             `json:"badge,omitempty"`
-	Sound           string          `json:"sound,omitempty"`
+	// AlertDictionary AlertDictionary `json:"alert,omitempty"`
+	AlertString string `json:"alert,omitempty"`
+	Badge       int    `json:"badge,omitempty"`
+	Sound       string `json:"sound,omitempty"`
 }
 
 type Payload struct {
